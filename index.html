@@ -1,0 +1,1906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check & Coin Dashboard System</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --panel-bg: rgba(30, 41, 59, 0.7);
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-primary: #6366f1;
+            --accent-primary-hover: #4f46e5;
+            --accent-secondary: #06b6d4;
+            --accent-danger: #f43f5e;
+            --accent-success: #10b981;
+            --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family);
+        }
+
+        body {
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .app-layout {
+            display: flex;
+            width: 100%;
+            max-width: 1400px;
+            gap: 30px;
+            align-items: flex-start;
+            height: calc(100vh - 80px);
+        }
+
+        .left-panel {
+            width: 300px;
+            flex-shrink: 0;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        /* Scale down Left Panel components to fit in 1 screen without scrolling */
+        .left-panel .container {
+            padding: 16px 20px;
+            border-radius: 16px;
+        }
+
+        /* left-panel h2 size is now controlled by .left-panel-title */
+
+        .left-panel .db-status {
+            margin-bottom: 10px;
+            font-size: 11px;
+        }
+
+        .left-panel .mode-tabs {
+            margin-bottom: 12px;
+            padding: 3px;
+            border-radius: 10px;
+        }
+
+        .left-panel .mode-tab {
+            padding: 6px 8px;
+            font-size: 12px;
+            border-radius: 7px;
+        }
+
+        .left-panel .form-group {
+            margin-bottom: 10px;
+        }
+
+        .left-panel label {
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+
+        .left-panel input[type="text"] {
+            padding: 9px 12px 9px 34px;
+            font-size: 13px;
+            border-radius: 10px;
+        }
+
+        .left-panel input[type="text"].plain {
+            padding: 9px 12px;
+        }
+
+        .left-panel select.level-select {
+            padding: 9px 12px;
+            font-size: 13px;
+            border-radius: 10px;
+            background-position: right 12px center;
+        }
+
+        .left-panel button.btn-submit {
+            padding: 9px;
+            font-size: 13px;
+            border-radius: 10px;
+        }
+
+        .left-panel .btn-sync {
+            padding: 7px;
+            font-size: 11px;
+            border-radius: 8px;
+            margin-top: 6px;
+        }
+
+        .left-panel .quick-links-container {
+            padding: 16px 20px !important;
+        }
+
+        .left-panel .quick-links-container h3 {
+            font-size: 11px !important;
+            margin-bottom: 10px !important;
+        }
+
+        .left-panel .quick-link-item {
+            padding: 8px 12px;
+            font-size: 12px;
+            border-radius: 8px;
+            gap: 8px;
+        }
+
+        .left-panel .quick-link-item svg {
+            width: 13px;
+            height: 13px;
+        }
+
+        .right-panel {
+            flex: 1;
+            height: 100%;
+            overflow-y: auto;
+            padding-right: 15px;
+        }
+
+        /* Custom Scrollbar for Right Panel */
+        .right-panel::-webkit-scrollbar { width: 6px; }
+        .right-panel::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 10px; }
+        .right-panel::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.2); border-radius: 10px; }
+        .right-panel::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.4); }
+
+        .container {
+            width: 100%;
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--panel-border);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        h2 {
+            margin-bottom: 6px;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            background: linear-gradient(to right, #a5b4fc, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            font-size: 22px;
+        }
+
+        .db-status {
+            text-align: center;
+            font-size: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .db-status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #64748b;
+            display: inline-block;
+            transition: background 0.3s;
+        }
+
+        .db-status-dot.loading {
+            background: #f59e0b;
+            animation: pulse 1s infinite;
+        }
+
+        .db-status-dot.loaded {
+            background: var(--accent-success);
+        }
+
+        .db-status-dot.error {
+            background: var(--accent-danger);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .db-status-text {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Name input wrapper for icon */
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #475569;
+            pointer-events: none;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 13px 16px 13px 42px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            font-size: 15px;
+            color: var(--text-primary);
+            transition: all 0.25s ease;
+        }
+
+        input[type="text"]::placeholder { color: #475569; }
+
+        input[type="text"]:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            outline: none;
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        /* Autocomplete dropdown */
+        .autocomplete-list {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background: #1e293b;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            z-index: 100;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            max-height: 220px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .autocomplete-list.visible { display: block; }
+
+        .autocomplete-item {
+            padding: 11px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            transition: background 0.15s;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .autocomplete-item:hover, .autocomplete-item.active {
+            background: rgba(99, 102, 241, 0.15);
+        }
+
+        .autocomplete-item .item-name { font-weight: 500; }
+
+        .autocomplete-item .item-level {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .level-badge-advance {
+            background: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .level-badge-basic {
+            background: rgba(6, 182, 212, 0.12);
+            color: #67e8f9;
+            border: 1px solid rgba(6, 182, 212, 0.25);
+        }
+
+        .no-result {
+            padding: 14px 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        /* Preview card sebelum add */
+        .student-preview {
+            background: rgba(99, 102, 241, 0.06);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            display: none;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .student-preview.visible { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .preview-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .preview-label { color: var(--text-secondary); }
+        .preview-value { color: var(--text-primary); font-weight: 600; font-size: 13px; }
+
+        .preview-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.05);
+            margin: 8px 0;
+        }
+
+        button.btn-submit {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-hover) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 10px 20px -10px rgba(99, 102, 241, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button.btn-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px -10px rgba(99, 102, 241, 0.6);
+        }
+
+        button.btn-submit:active { transform: translateY(0); }
+
+        button.btn-submit:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* Sync button */
+        .btn-sync {
+            width: 100%;
+            padding: 9px;
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--panel-border);
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .btn-sync:hover {
+            border-color: rgba(255,255,255,0.2);
+            color: var(--text-primary);
+            background: rgba(255,255,255,0.04);
+        }
+
+        .btn-sync svg { transition: transform 0.4s ease; }
+        .btn-sync.spinning svg { animation: spin 0.8s linear infinite; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Clear button */
+        .btn-clear {
+            padding: 8px 14px;
+            background: rgba(244, 63, 94, 0.08);
+            color: var(--accent-danger);
+            border: 1px solid rgba(244, 63, 94, 0.2);
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-clear:hover:not(:disabled) {
+            background: rgba(244, 63, 94, 0.15);
+            border-color: rgba(244, 63, 94, 0.35);
+            color: #ff4a6b;
+            box-shadow: 0 0 12px rgba(244, 63, 94, 0.15);
+        }
+
+        .btn-clear:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            background: transparent;
+            border-color: var(--panel-border);
+            color: var(--text-secondary);
+            box-shadow: none;
+        }
+
+        /* Icon Button style */
+        .btn-icon-only {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--panel-border);
+            color: var(--text-secondary);
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .btn-icon-only:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: rgba(99, 102, 241, 0.3);
+            color: var(--text-primary);
+        }
+
+        /* Modal Backdrop */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .modal-backdrop.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Modal Content */
+        .modal-content {
+            background: #1e293b;
+            border: 1px solid var(--panel-border);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            transform: scale(0.95) translateY(15px);
+            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Custom Scrollbar for Modal Content */
+        .modal-content::-webkit-scrollbar { width: 6px; }
+        .modal-content::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 10px; }
+        .modal-content::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.2); border-radius: 10px; }
+        .modal-content::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.4); }
+
+        .modal-backdrop.visible .modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--panel-border);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(to right, #a5b4fc, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            padding: 0;
+        }
+
+        .modal-close:hover {
+            color: var(--accent-danger);
+            background: rgba(244, 63, 94, 0.08);
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .form-section-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--accent-primary);
+            margin: 20px 0 12px 0;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .form-section-title:first-child {
+            margin-top: 0;
+        }
+
+        /* Schedule grid inputs */
+        .schedule-grid-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 16px;
+        }
+
+        @media (max-width: 576px) {
+            .schedule-grid-inputs {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Panel Headers */
+        .left-panel-header,
+        .right-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--panel-border);
+        }
+
+        .left-panel-header {
+            margin-bottom: 6px; /* 20px total gap (14px flex gap + 6px margin) to align with right panel */
+        }
+
+        .right-panel-header {
+            margin-bottom: 20px;
+        }
+
+        .left-panel-title,
+        .right-panel-title {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(to right, #a5b4fc, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Quick Links */
+        .quick-link-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--panel-border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .quick-link-item:hover {
+            background: rgba(99, 102, 241, 0.08);
+            border-color: rgba(99, 102, 241, 0.3);
+            color: #a5b4fc;
+            transform: translateX(3px);
+        }
+
+        .quick-link-item svg {
+            color: var(--text-secondary);
+            transition: color 0.2s;
+            flex-shrink: 0;
+        }
+
+        .quick-link-item:hover svg {
+            color: #a5b4fc;
+        }
+
+        /* Student row card layout */
+        .student-row-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            gap: 15px;
+        }
+
+        .student-row-card:hover {
+            transform: translateY(-2px);
+            background: rgba(15, 23, 42, 0.6);
+            border-color: rgba(255,255,255,0.12);
+            box-shadow: 0 8px 20px -8px rgba(99, 102, 241, 0.2);
+        }
+
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .student-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        /* Action button styles */
+        .action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6.5px;
+            padding: 8px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-action-check {
+            background: rgba(6, 182, 212, 0.08);
+            color: var(--accent-secondary);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            min-width: 130px;
+        }
+
+        .btn-action-check:hover {
+            background: rgba(6, 182, 212, 0.18);
+            border-color: rgba(6, 182, 212, 0.4);
+            color: #22d3ee;
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+        }
+
+        .btn-action-progress {
+            background: rgba(245, 158, 11, 0.08);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            min-width: 140px;
+        }
+
+        .btn-action-progress:hover {
+            background: rgba(245, 158, 11, 0.18);
+            border-color: rgba(245, 158, 11, 0.4);
+            color: #fbbf24;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+        }
+
+        .btn-action-coin {
+            background: rgba(16, 185, 129, 0.08);
+            color: var(--accent-success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            min-width: 90px;
+        }
+
+        .btn-action-coin:hover {
+            background: rgba(16, 185, 129, 0.18);
+            border-color: rgba(16, 185, 129, 0.4);
+            color: #34d399;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+        }
+
+        /* Row Delete Button */
+        .row-delete-btn {
+            width: 24px;
+            height: 24px;
+            background: rgba(244, 63, 94, 0.08);
+            color: var(--accent-danger);
+            border: 1px solid rgba(244, 63, 94, 0.18);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            padding: 0;
+        }
+
+        .row-delete-btn svg {
+            display: block;
+            transition: transform 0.25s ease;
+        }
+
+        .row-delete-btn:hover {
+            background: var(--accent-danger);
+            color: white;
+            box-shadow: 0 0 10px rgba(244, 63, 94, 0.35);
+        }
+
+        .row-delete-btn:hover svg {
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        @media (max-width: 992px) {
+            body { height: auto; padding: 20px 10px; }
+            .app-layout { flex-direction: column; height: auto; gap: 30px; }
+            .left-panel { width: 100%; height: auto; overflow: visible; padding-right: 0; }
+            .right-panel { width: 100%; height: auto; overflow-y: visible; padding-right: 0; }
+        }
+
+        @media (max-width: 576px) {
+            .student-row-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+                padding: 14px;
+            }
+            .student-info {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .student-actions {
+                width: 100%;
+                justify-content: flex-end;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+        }
+
+        .section-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--panel-border);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            min-height: 200px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 12px;
+        }
+
+        .section-title { font-size: 17px; font-weight: 700; }
+        .check-title { color: var(--accent-secondary); }
+        .coin-title { color: var(--accent-success); }
+
+        .section-count {
+            margin-left: auto;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 2px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .cards-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Card */
+        .box-wrapper {
+            position: relative;
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            opacity: 0;
+            transform: scale(0.95) translateY(8px);
+            animation: cardEntrance 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes cardEntrance {
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .box-wrapper.removing {
+            animation: cardExit 0.28s cubic-bezier(0.4, 0, 1, 1) forwards;
+        }
+
+        @keyframes cardExit {
+            to { opacity: 0; transform: scale(0.9) translateY(-8px); height: 0; margin: 0; padding: 0; border-width: 0; }
+        }
+
+        .box-wrapper:hover {
+            transform: translateY(-2px);
+            background: rgba(15, 23, 42, 0.6);
+            border-color: rgba(255,255,255,0.12);
+        }
+
+        .check-card:hover { box-shadow: 0 8px 20px -8px rgba(6, 182, 212, 0.25); }
+        .coin-card:hover  { box-shadow: 0 8px 20px -8px rgba(16, 185, 129, 0.25); }
+
+        .link-box {
+            display: flex;
+            align-items: center;
+            padding: 14px 50px 14px 16px;
+            text-decoration: none;
+            height: 100%;
+            gap: 10px;
+        }
+
+        .card-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-level-badge {
+            font-size: 10px;
+            padding: 2px 7px;
+            border-radius: 20px;
+            font-weight: 600;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* Close button */
+        .close-btn {
+            position: absolute;
+            top: 50%;
+            right: 13px;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            background: rgba(244, 63, 94, 0.08);
+            color: var(--accent-danger);
+            border: 1px solid rgba(244, 63, 94, 0.18);
+            border-radius: 50%;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        .close-btn:hover {
+            background: var(--accent-danger);
+            color: white;
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 0 10px rgba(244, 63, 94, 0.35);
+        }
+
+        /* Toast */
+        #toastContainer {
+            position: fixed;
+            top: 22px;
+            right: 22px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast {
+            min-width: 270px;
+            max-width: 340px;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--panel-border);
+            border-left: 4px solid var(--accent-primary);
+            padding: 12px 16px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateX(50px);
+            animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            pointer-events: auto;
+        }
+
+        .toast.success { border-left-color: var(--accent-success); }
+        .toast.danger  { border-left-color: var(--accent-danger); }
+        .toast.warning { border-left-color: #f59e0b; }
+
+        @keyframes toastIn  { to { opacity: 1; transform: translateX(0); } }
+
+        .toast.fade-out {
+            animation: toastOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes toastOut { to { opacity: 0; transform: translateY(-16px) scale(0.92); } }
+
+        .toast-content { display: flex; align-items: center; gap: 9px; }
+
+        .toast-close {
+            background: none; border: none;
+            color: var(--text-secondary);
+            cursor: pointer; margin-left: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            padding: 0;
+            transition: all 0.2s ease;
+        }
+        .toast-close:hover {
+            color: var(--accent-danger);
+            background: rgba(244, 63, 94, 0.08);
+        }
+
+        /* Empty state */
+        .empty-state {
+            color: var(--text-secondary);
+            text-align: center;
+            font-size: 13px;
+            padding: 30px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            opacity: 0.6;
+        }
+
+        /* Mode toggle tabs */
+        .mode-tabs {
+            display: flex;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 20px;
+            gap: 4px;
+        }
+
+        .mode-tab {
+            flex: 1;
+            padding: 8px 10px;
+            border: none;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: transparent;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .mode-tab:hover {
+            color: var(--text-primary);
+            background: rgba(255,255,255,0.04);
+        }
+
+        .mode-tab.active {
+            background: var(--accent-primary);
+            color: #fff;
+            box-shadow: 0 4px 12px -4px rgba(99,102,241,0.5);
+        }
+
+        /* Panel sections that switch */
+        .mode-panel {
+            display: none;
+            animation: fadeIn 0.2s ease;
+        }
+        .mode-panel.active { display: block; }
+
+        /* Manual input — plain text (no icon) */
+        input[type="text"].plain {
+            padding: 13px 16px;
+        }
+
+        /* Level select */
+        select.level-select {
+            width: 100%;
+            padding: 13px 16px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            font-size: 15px;
+            color: var(--text-primary);
+            transition: all 0.25s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            cursor: pointer;
+        }
+
+        select.level-select option {
+            background: #1e293b;
+            color: var(--text-primary);
+        }
+
+        select.level-select:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            outline: none;
+            background-color: rgba(15, 23, 42, 0.8);
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- Left Panel -->
+    <div class="left-panel">
+        <div class="left-panel-header">
+            <h2 class="left-panel-title">Check & Coin Dashboard</h2>
+            <button id="settingsBtn" class="btn-icon-only" type="button" title="Settings">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </button>
+        </div>
+        <div class="container">
+
+            <!-- DB Status -->
+            <div class="db-status">
+                <span class="db-status-dot loading" id="dbDot"></span>
+                <span class="db-status-text" id="dbStatusText">Loading database...</span>
+            </div>
+
+            <!-- Mode tabs -->
+            <div class="mode-tabs">
+                <button class="mode-tab active" id="tabSearch" type="button">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    Search
+                </button>
+                <button class="mode-tab" id="tabManual" type="button">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    Manual
+                </button>
+            </div>
+
+            <form id="studentForm">
+
+                <!-- ── Search mode ── -->
+                <div class="mode-panel active" id="panelSearch">
+                    <div class="form-group">
+                        <label for="nameInput">Student Name</label>
+                        <div class="input-wrapper">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            <input type="text" id="nameInput" placeholder="Search student name..." autocomplete="off" disabled>
+                        </div>
+                        <!-- Custom autocomplete dropdown -->
+                        <div class="autocomplete-list" id="autocompleteList"></div>
+                    </div>
+
+                    <!-- Preview checkbox option -->
+                    <div class="form-group checkbox-group" style="display: flex; align-items: center; gap: 8px; margin-top: -4px; margin-bottom: 10px;">
+                        <input type="checkbox" id="previewCheckbox" style="accent-color: var(--accent-primary); cursor: pointer; width: 14px; height: 14px; flex-shrink: 0;">
+                        <label for="previewCheckbox" style="margin-bottom: 0; cursor: pointer; font-size: 11px; font-weight: 500; color: var(--text-secondary); user-select: none;">
+                            Show preview before adding
+                        </label>
+                    </div>
+
+                    <!-- Student preview card -->
+                    <div class="student-preview" id="studentPreview">
+                        <div class="preview-row">
+                            <span class="preview-label">Name</span>
+                            <span class="preview-value" id="previewName">—</span>
+                        </div>
+                        <div class="preview-divider"></div>
+                        <div class="preview-row">
+                            <span class="preview-label">Username</span>
+                            <span class="preview-value" id="previewUsername">—</span>
+                        </div>
+                        <div class="preview-divider"></div>
+                        <div class="preview-row">
+                            <span class="preview-label">Level</span>
+                            <span class="preview-value" id="previewLevel">—</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Manual mode ── -->
+                <div class="mode-panel" id="panelManual">
+                    <div class="form-group">
+                        <label for="manualName">Name</label>
+                        <input type="text" id="manualName" class="plain" placeholder="e.g. John Doe" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="manualUsername">Username</label>
+                        <input type="text" id="manualUsername" class="plain" placeholder="e.g. johndoe" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="manualLevel">Level</label>
+                        <select id="manualLevel" class="level-select">
+                            <option value="Basic">Basic</option>
+                            <option value="Intermediate">Intermediate</option>
+                            <option value="Advance">Advance</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit" id="addBtn" disabled>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Add Student
+                </button>
+            </form>
+
+            <button class="btn-sync" id="syncBtn">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                Sync Database
+            </button>
+        </div>
+
+        <!-- Quick Links Panel -->
+        <div class="container quick-links-container" style="padding: 25px 30px;">
+            <h3 style="font-size: 13px; font-weight: 700; margin-bottom: 14px; color: var(--accent-primary); letter-spacing: 0.05em; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                Quick Links
+            </h3>
+            <div class="quick-links-list" style="display: flex; flex-direction: column; gap: 10px;">
+                <a href="#" target="_blank" class="quick-link-item" id="liveAttendanceLink">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <span>Live Attendance</span>
+                </a>
+                <a href="#" target="_blank" class="quick-link-item" id="weeklyScheduleLink">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    <span>Weekly Schedule<span id="weeklyScheduleDayLabel" style="font-weight: 400; opacity: 0.8;"></span></span>
+                </a>
+                <a href="#" target="_blank" class="quick-link-item" id="studentDatabaseLink">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
+                    <span>Student Database</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="right-panel">
+        <div class="right-panel-header">
+            <h2 class="right-panel-title">Active Students</h2>
+            <button class="btn-clear" id="clearBtn">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                Clear All
+            </button>
+        </div>
+        <div class="section-panel" style="min-height: calc(100% - 60px);">
+            <div class="section-header" style="border-bottom: none; margin-bottom: 12px; padding-bottom: 0;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <h3 class="section-title" style="color: var(--accent-primary);">Students List</h3>
+                <span class="section-count" id="studentCount">0</span>
+            </div>
+            <div class="cards-list" id="studentListContainer"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Settings Modal -->
+<div id="settingsModal" class="modal-backdrop">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">System Settings</h3>
+            <button class="modal-close" id="closeSettingsBtn" type="button" title="Close Settings">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="settingsForm">
+                <div class="form-section-title">Database Settings</div>
+                <div class="form-group">
+                    <label for="setCsvUrl">Google Sheets CSV Sync URL</label>
+                    <input type="text" id="setCsvUrl" class="plain" placeholder="Google Sheets published CSV URL..." autocomplete="off">
+                </div>
+                
+                <div class="form-section-title">Quick Links Settings</div>
+                <div class="form-group">
+                    <label for="setAttendanceUrl">Live Attendance Link</label>
+                    <input type="text" id="setAttendanceUrl" class="plain" placeholder="Live Attendance spreadsheet link..." autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="setDbSheetUrl">Student Database Spreadsheet Link</label>
+                    <input type="text" id="setDbSheetUrl" class="plain" placeholder="Student Database link..." autocomplete="off">
+                </div>
+
+                <div class="form-section-title">Weekly Schedule Links (Asia/Jakarta Time)</div>
+                <div class="schedule-grid-inputs">
+                    <div class="form-group">
+                        <label for="setSchedMon">Monday (Senin)</label>
+                        <input type="text" id="setSchedMon" class="plain" placeholder="Monday link..." autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="setSchedTue">Tuesday (Selasa)</label>
+                        <input type="text" id="setSchedTue" class="plain" placeholder="Tuesday link..." autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="setSchedWed">Wednesday (Rabu)</label>
+                        <input type="text" id="setSchedWed" class="plain" placeholder="Wednesday link..." autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="setSchedThu">Thursday (Kamis)</label>
+                        <input type="text" id="setSchedThu" class="plain" placeholder="Thursday link..." autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="setSchedFri">Friday (Jumat)</label>
+                        <input type="text" id="setSchedFri" class="plain" placeholder="Friday link..." autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="setSchedSat">Saturday (Sabtu)</label>
+                        <input type="text" id="setSchedSat" class="plain" placeholder="Saturday link..." autocomplete="off">
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 12px; margin-top: 25px;">
+                    <button type="submit" class="btn-submit" style="flex: 2;">Save Settings</button>
+                    <button type="button" class="btn-sync" id="resetSettingsBtn" style="flex: 1; margin-top: 0; padding: 13px;">Reset Defaults</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Toast notifications -->
+<div id="toastContainer"></div>
+
+<script>
+    // ─── Config & System Defaults ───────────────────────────────────────────────
+    const DEFAULT_CONFIG = {
+        csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQV0hIaXYBOHdhSlMGDfog3xYdVe604tqEYEG1qUSxbFYfvQPIWQW5Pm9PEJFWkRvm1E3HPUq2GnfCu/pub?output=csv',
+        attendanceUrl: 'https://docs.google.com/spreadsheets/d/1kG7yWcK8BU6Gy46CA33xbW9VN-6s9OPUCgzntWgFr3I/edit?gid=8538346#gid=8538346',
+        dbSheetUrl: 'https://docs.google.com/spreadsheets/d/1A0FX7iSZOw24O7hGUh6wYaapTjmnMxvrdqbL1dLygYU/edit?gid=0#gid=0',
+        weeklyLinks: {
+            1: 'https://docs.google.com/spreadsheets/d/1SYlGpml9Fho74r2GexbbydlHmP_dmJyoaHbQ8uyX3RU/edit?gid=1127820378#gid=1127820378', // Monday
+            2: 'https://docs.google.com/spreadsheets/d/1SYlGpml9Fho74r2GexbbydlHmP_dmJyoaHbQ8uyX3RU/edit?gid=821547728#gid=821547728',     // Tuesday
+            3: 'https://docs.google.com/spreadsheets/d/1SYlGpml9Fho74r2GexbbydlHmP_dmJyoaHbQ8uyX3RU/edit?gid=148495295#gid=148495295',     // Wednesday
+            4: 'https://docs.google.com/spreadsheets/d/1SYlGpml9Fho74r2GexbbydlHmP_dmJyoaHbQ8uyX3RU/edit?gid=2033895052#gid=2033895052',   // Thursday
+            5: 'https://docs.google.com/spreadsheets/d/1SYlGpml9Fho74r2GexbbydlHmP_dmJyoaHbQ8uyX3RU/edit?gid=209672749#gid=209672749',     // Friday
+            6: 'https://docs.google.com/spreadsheets/d/1SYlGpml9Fho74r2GexbbydlHmP_dmJyoaHbQ8uyX3RU/edit?gid=675120544#gid=675120544',     // Saturday
+            0: 'https://docs.google.com/spreadsheets/d/1SYlGpml9Fho74r2GexbbydlHmP_dmJyoaHbQ8uyX3RU/edit?gid=1127820378#gid=1127820378'  // Sunday
+        }
+    };
+
+    let sysConfig = {};
+
+    function loadSystemConfig() {
+        const stored = localStorage.getItem('system_config');
+        if (stored) {
+            try {
+                sysConfig = JSON.parse(stored);
+                // Ensure all fields are filled, otherwise fall back to defaults
+                sysConfig.csvUrl = sysConfig.csvUrl || DEFAULT_CONFIG.csvUrl;
+                sysConfig.attendanceUrl = sysConfig.attendanceUrl || DEFAULT_CONFIG.attendanceUrl;
+                sysConfig.dbSheetUrl = sysConfig.dbSheetUrl || DEFAULT_CONFIG.dbSheetUrl;
+                sysConfig.weeklyLinks = sysConfig.weeklyLinks || {};
+                for (let d = 0; d <= 6; d++) {
+                    sysConfig.weeklyLinks[d] = sysConfig.weeklyLinks[d] || DEFAULT_CONFIG.weeklyLinks[d];
+                }
+            } catch (e) {
+                console.error("Failed to parse config, loading defaults:", e);
+                sysConfig = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+            }
+        } else {
+            sysConfig = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+        }
+    }
+
+    // Load configuration immediately
+    loadSystemConfig();
+
+    // Level classification
+    const ADVANCE_KEYWORDS  = ['advance'];
+    const BASIC_INT_KEYWORDS = ['basic', 'intermediate'];
+
+    function isAdvanceLevel(level) {
+        const l = level.toLowerCase();
+        return ADVANCE_KEYWORDS.some(k => l.includes(k));
+    }
+
+    function getCheckUrl(username, level) {
+        const prefix = isAdvanceLevel(level)
+            ? 'https://web.thelab.id/coder/python/ide.html?ispending=true&username='
+            : 'https://web.thelab.id/coder/rpi/GroveHat/coder.html?ispending=true&username=';
+        return prefix + encodeURIComponent(username);
+    }
+
+    function getProgressUrl(username) {
+        return 'https://web.thelab.id/instructor/modifystudentprogresscurrent.html?username=' + encodeURIComponent(username);
+    }
+
+    function getCoinUrl(username) {
+        return 'https://web.thelab.id/coinsystem/modifystudentcoin.html?username=' + encodeURIComponent(username);
+    }
+
+    function getLevelBadgeClass(level) {
+        return isAdvanceLevel(level) ? 'level-badge-advance' : 'level-badge-basic';
+    }
+
+    // ─── State ───────────────────────────────────────────────────────────────────
+    let database    = [];   // All students from spreadsheet
+    let studentList = JSON.parse(localStorage.getItem('studentList')) || [];   // Active students added to dashboard
+    let selectedStudent = null;
+
+    function saveStudentsToLocalStorage() {
+        localStorage.setItem('studentList', JSON.stringify(studentList));
+    }
+    let currentMode = 'search'; // 'search' | 'manual'
+
+    // ─── DOM refs ────────────────────────────────────────────────────────────────
+    const nameInput        = document.getElementById('nameInput');
+    const autocompleteList = document.getElementById('autocompleteList');
+    const studentPreview   = document.getElementById('studentPreview');
+    const previewName      = document.getElementById('previewName');
+    const previewUsername  = document.getElementById('previewUsername');
+    const previewLevel     = document.getElementById('previewLevel');
+    const addBtn           = document.getElementById('addBtn');
+    const syncBtn          = document.getElementById('syncBtn');
+    const clearBtn         = document.getElementById('clearBtn');
+    const dbDot            = document.getElementById('dbDot');
+    const dbStatusText     = document.getElementById('dbStatusText');
+    const studentListContainer = document.getElementById('studentListContainer');
+    const studentCount         = document.getElementById('studentCount');
+    // Manual mode
+    const manualName       = document.getElementById('manualName');
+    const manualUsername   = document.getElementById('manualUsername');
+    const manualLevel      = document.getElementById('manualLevel');
+    const tabSearch        = document.getElementById('tabSearch');
+    const tabManual        = document.getElementById('tabManual');
+    const panelSearch      = document.getElementById('panelSearch');
+    const panelManual      = document.getElementById('panelManual');
+
+    // ─── Toast ───────────────────────────────────────────────────────────────────
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+
+        const icons = {
+            success: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent-success)"><polyline points="20 6 9 17 4 12"/></svg>`,
+            danger:  `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent-danger)"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
+            warning: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:#f59e0b"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+        };
+
+        toast.innerHTML = `
+            <div class="toast-content">${icons[type] || ''}<span>${message}</span></div>
+            <button class="toast-close" title="Dismiss">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>`;
+        container.appendChild(toast);
+
+        const t = setTimeout(() => dismiss(toast), 3000);
+        toast.querySelector('.toast-close').addEventListener('click', () => { clearTimeout(t); dismiss(toast); });
+    }
+
+    function dismiss(toast) {
+        toast.classList.add('fade-out');
+        toast.addEventListener('animationend', () => toast.remove());
+    }
+
+    // ─── Database (CSV) ──────────────────────────────────────────────────────────
+    function setDbStatus(state, text) {
+        dbDot.className = 'db-status-dot ' + state;
+        dbStatusText.textContent = text;
+    }
+
+    function parseCSV(text) {
+        const lines = text.trim().split('\n');
+        if (lines.length < 2) return [];
+        // Detect header: first line
+        const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/\r/g, ''));
+        const nameIdx     = headers.findIndex(h => h === 'name');
+        const usernameIdx = headers.findIndex(h => h === 'username');
+        const levelIdx    = headers.findIndex(h => h === 'level');
+
+        if (nameIdx === -1 || usernameIdx === -1 || levelIdx === -1) return null; // missing columns
+
+        return lines.slice(1).map(line => {
+            const cols = line.split(',').map(c => c.trim().replace(/\r/g, ''));
+            return {
+                name:     cols[nameIdx]     || '',
+                username: cols[usernameIdx] || '',
+                level:    cols[levelIdx]    || '',
+            };
+        }).filter(s => s.name && s.username);
+    }
+
+    async function loadDatabase() {
+        setDbStatus('loading', 'Loading database...');
+        nameInput.disabled = true;
+        addBtn.disabled = true;
+        syncBtn.classList.add('spinning');
+
+        try {
+            const res = await fetch(sysConfig.csvUrl);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const text = await res.text();
+            const parsed = parseCSV(text);
+
+            if (!parsed) {
+                setDbStatus('error', 'Invalid sheet format (need: Name, Username, Level)');
+                showToast('Invalid spreadsheet format!', 'danger');
+                return;
+            }
+
+            database = parsed;
+            setDbStatus('loaded', `${database.length} students loaded`);
+            nameInput.disabled = false;
+            nameInput.placeholder = `Search from ${database.length} students...`;
+            showToast(`Database loaded — ${database.length} students`, 'success');
+        } catch (err) {
+            setDbStatus('error', 'Failed to load. Check URL or network.');
+            showToast('Failed to load database', 'danger');
+            console.error(err);
+        } finally {
+            syncBtn.classList.remove('spinning');
+        }
+    }
+
+    // ─── Autocomplete ─────────────────────────────────────────────────────────────
+    function showAutocomplete(query) {
+        autocompleteList.innerHTML = '';
+        if (!query || query.length < 1) {
+            autocompleteList.classList.remove('visible');
+            return;
+        }
+
+        const q = query.toLowerCase();
+        const results = database.filter(s => s.name.toLowerCase().includes(q)).slice(0, 8);
+
+        if (results.length === 0) {
+            autocompleteList.innerHTML = `<div class="no-result">No match found</div>`;
+            autocompleteList.classList.add('visible');
+            return;
+        }
+
+        results.forEach((student, i) => {
+            const item = document.createElement('div');
+            item.className = 'autocomplete-item';
+            item.innerHTML = `
+                <span class="item-name">${highlightMatch(student.name, query)}</span>
+                <span class="item-level ${getLevelBadgeClass(student.level)}">${student.level}</span>`;
+            item.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                handleAutocompleteSelect(student);
+            });
+            autocompleteList.appendChild(item);
+        });
+
+        autocompleteList.classList.add('visible');
+    }
+
+    function highlightMatch(text, query) {
+        const idx = text.toLowerCase().indexOf(query.toLowerCase());
+        if (idx === -1) return text;
+        return text.slice(0, idx)
+            + `<strong style="color:var(--accent-primary)">${text.slice(idx, idx + query.length)}</strong>`
+            + text.slice(idx + query.length);
+    }
+
+    function selectStudent(student) {
+        selectedStudent = student;
+        nameInput.value = student.name;
+        autocompleteList.classList.remove('visible');
+
+        // Show preview
+        previewName.textContent     = student.name;
+        previewUsername.textContent = student.username;
+        previewLevel.textContent    = student.level;
+        studentPreview.classList.add('visible');
+        addBtn.disabled = false;
+    }
+
+    function handleAutocompleteSelect(student) {
+        const showPreview = document.getElementById('previewCheckbox').checked;
+        if (showPreview) {
+            selectStudent(student);
+        } else {
+            const success = addStudentToList(student);
+            if (success) {
+                nameInput.value = '';
+                clearSelection();
+                autocompleteList.classList.remove('visible');
+            }
+        }
+    }
+
+    // Common function to add a student to the active list
+    function addStudentToList(studentData) {
+        const alreadyAdded = studentList.find(s => s.username === studentData.username);
+        if (alreadyAdded) {
+            showToast(`"${studentData.name}" is already in the list`, 'warning');
+            return false;
+        }
+        const student = { ...studentData, id: Date.now().toString() };
+        studentList.push(student);
+        saveStudentsToLocalStorage();
+        renderList();
+        showToast(`"${student.name}" added successfully!`, 'success');
+        return true;
+    }
+
+    function clearSelection() {
+        selectedStudent = null;
+        studentPreview.classList.remove('visible');
+        addBtn.disabled = true;
+    }
+
+    nameInput.addEventListener('input', () => {
+        clearSelection();
+        showAutocomplete(nameInput.value);
+    });
+
+    nameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            autocompleteList.classList.remove('visible');
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.form-group')) {
+            autocompleteList.classList.remove('visible');
+        }
+    });
+
+    // ─── Mode toggle ─────────────────────────────────────────────────────────────
+    function switchMode(mode) {
+        currentMode = mode;
+        if (mode === 'search') {
+            tabSearch.classList.add('active');
+            tabManual.classList.remove('active');
+            panelSearch.classList.add('active');
+            panelManual.classList.remove('active');
+            // Re-evaluate add button: only enable if a student is selected
+            addBtn.disabled = !selectedStudent;
+        } else {
+            tabManual.classList.add('active');
+            tabSearch.classList.remove('active');
+            panelManual.classList.add('active');
+            panelSearch.classList.remove('active');
+            // Enable add button when manual fields are non-empty
+            validateManual();
+        }
+    }
+
+    function validateManual() {
+        const ok = manualName.value.trim() !== '' && manualUsername.value.trim() !== '';
+        addBtn.disabled = !ok;
+    }
+
+    tabSearch.addEventListener('click', () => switchMode('search'));
+    tabManual.addEventListener('click', () => switchMode('manual'));
+
+    manualName.addEventListener('input', validateManual);
+    manualUsername.addEventListener('input', validateManual);
+
+    // ─── Add / Delete Student ────────────────────────────────────────────────────
+    document.getElementById('studentForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        if (currentMode === 'search') {
+            // ── Search path ──
+            if (!selectedStudent) return;
+            const success = addStudentToList(selectedStudent);
+            if (success) {
+                nameInput.value = '';
+                clearSelection();
+            }
+
+        } else {
+            // ── Manual path ──
+            const name     = manualName.value.trim();
+            const username = manualUsername.value.trim();
+            const level    = manualLevel.value;
+            if (!name || !username) return;
+
+            const alreadyAdded = studentList.find(s => s.username === username);
+            if (alreadyAdded) {
+                showToast(`Username "${username}" is already in the list`, 'warning');
+                return;
+            }
+            const student = { name, username, level, id: Date.now().toString() };
+            studentList.push(student);
+            saveStudentsToLocalStorage();
+            renderList();
+            showToast(`"${name}" added manually!`, 'success');
+            // Reset manual fields
+            manualName.value = '';
+            manualUsername.value = '';
+            manualLevel.selectedIndex = 0;
+            addBtn.disabled = true;
+        }
+    });
+
+    function deleteStudent(id, name) {
+        document.querySelectorAll(`[data-student-id="${id}"]`).forEach(el => el.classList.add('removing'));
+        setTimeout(() => {
+            studentList = studentList.filter(s => s.id !== id);
+            saveStudentsToLocalStorage();
+            renderList();
+            showToast(`"${name}" removed`, 'danger');
+        }, 280);
+    }
+
+    // ─── Render ──────────────────────────────────────────────────────────────────
+    function renderList() {
+        studentListContainer.innerHTML = '';
+        studentCount.textContent = studentList.length;
+
+        clearBtn.disabled = studentList.length === 0;
+
+        if (studentList.length === 0) {
+            studentListContainer.innerHTML = `
+                <div class="empty-state">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <span>No active students on dashboard</span>
+                </div>`;
+            return;
+        }
+
+        studentList.forEach(student => {
+            const badgeClass = getLevelBadgeClass(student.level);
+            const checkUrl = getCheckUrl(student.username, student.level);
+            const progressUrl = getProgressUrl(student.username);
+            const coinUrl = getCoinUrl(student.username);
+
+            const row = document.createElement('div');
+            row.className = 'box-wrapper student-row-card';
+            row.setAttribute('data-student-id', student.id);
+            row.innerHTML = `
+                <div class="student-info">
+                    <span class="card-name" title="${student.name}">${student.name}</span>
+                    <span class="card-level-badge ${badgeClass}">${student.level}</span>
+                </div>
+                <div class="student-actions">
+                    <a href="${checkUrl}" target="_blank" class="action-btn btn-action-check" title="Check IDE Answer">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        <span>Check Answer</span>
+                    </a>
+                    <a href="${progressUrl}" target="_blank" class="action-btn btn-action-progress" title="Student Progress">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                        <span>Student Progress</span>
+                    </a>
+                    <a href="${coinUrl}" target="_blank" class="action-btn btn-action-coin" title="Modify Student Coins">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        <span>Coin</span>
+                    </a>
+                    <button class="row-delete-btn" title="Remove Student">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>`;
+            
+            row.querySelector('.row-delete-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                deleteStudent(student.id, student.name);
+            });
+
+            studentListContainer.appendChild(row);
+        });
+    }
+
+    // ─── Sync button ──────────────────────────────────────────────────────────────
+    syncBtn.addEventListener('click', loadDatabase);
+
+    clearBtn.addEventListener('click', () => {
+        if (studentList.length === 0) return;
+        if (confirm("Are you sure you want to clear all students from the dashboard?")) {
+            // Animate removing for all cards first
+            document.querySelectorAll('.box-wrapper').forEach(el => el.classList.add('removing'));
+            setTimeout(() => {
+                studentList = [];
+                saveStudentsToLocalStorage();
+                renderList();
+                showToast("All students cleared from dashboard", "danger");
+            }, 280);
+        }
+    });
+
+    // ─── Quick Links Logic ────────────────────────────────────────────────────────
+    function updateWeeklyLink() {
+        const linkEl = document.getElementById('weeklyScheduleLink');
+        if (!linkEl) return;
+        
+        let dayIdx = 1; // Default to Monday
+        try {
+            const dateStr = new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' });
+            dayIdx = new Date(dateStr).getDay();
+        } catch (e) {
+            console.error("Failed to parse Jakarta time:", e);
+        }
+        
+        linkEl.href = sysConfig.weeklyLinks[dayIdx] || sysConfig.weeklyLinks[1];
+        
+        const daysMap = {
+            1: 'Monday',
+            2: 'Tuesday',
+            3: 'Wednesday',
+            4: 'Thursday',
+            5: 'Friday',
+            6: 'Saturday',
+            0: 'Sunday (Monday Link)'
+        };
+        const dayName = daysMap[dayIdx] || 'Monday';
+        const labelEl = document.getElementById('weeklyScheduleDayLabel');
+        if (labelEl) {
+            labelEl.textContent = ` (${dayName})`;
+        }
+    }
+
+    function updateQuickLinksHref() {
+        const attendanceEl = document.getElementById('liveAttendanceLink');
+        const dbSheetEl = document.getElementById('studentDatabaseLink');
+        
+        if (attendanceEl) {
+            attendanceEl.href = sysConfig.attendanceUrl;
+        }
+        if (dbSheetEl) {
+            dbSheetEl.href = sysConfig.dbSheetUrl;
+        }
+        
+        updateWeeklyLink();
+    }
+
+    // ─── Settings Modal Logic ─────────────────────────────────────────────────────
+    const settingsModal    = document.getElementById('settingsModal');
+    const settingsBtn      = document.getElementById('settingsBtn');
+    const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+    const settingsForm     = document.getElementById('settingsForm');
+    const resetSettingsBtn = document.getElementById('resetSettingsBtn');
+
+    // Modal inputs
+    const setCsvUrl        = document.getElementById('setCsvUrl');
+    const setAttendanceUrl = document.getElementById('setAttendanceUrl');
+    const setDbSheetUrl    = document.getElementById('setDbSheetUrl');
+    const setSchedMon      = document.getElementById('setSchedMon');
+    const setSchedTue      = document.getElementById('setSchedTue');
+    const setSchedWed      = document.getElementById('setSchedWed');
+    const setSchedThu      = document.getElementById('setSchedThu');
+    const setSchedFri      = document.getElementById('setSchedFri');
+    const setSchedSat      = document.getElementById('setSchedSat');
+
+    // Open modal
+    settingsBtn.addEventListener('click', () => {
+        // Populate inputs with current sysConfig values
+        setCsvUrl.value = sysConfig.csvUrl;
+        setAttendanceUrl.value = sysConfig.attendanceUrl;
+        setDbSheetUrl.value = sysConfig.dbSheetUrl;
+        setSchedMon.value = sysConfig.weeklyLinks[1];
+        setSchedTue.value = sysConfig.weeklyLinks[2];
+        setSchedWed.value = sysConfig.weeklyLinks[3];
+        setSchedThu.value = sysConfig.weeklyLinks[4];
+        setSchedFri.value = sysConfig.weeklyLinks[5];
+        setSchedSat.value = sysConfig.weeklyLinks[6];
+
+        settingsModal.classList.add('visible');
+    });
+
+    // Close modal
+    closeSettingsBtn.addEventListener('click', () => {
+        settingsModal.classList.remove('visible');
+    });
+
+    // Close on click outside modal content
+    settingsModal.addEventListener('click', (e) => {
+        if (e.target === settingsModal) {
+            settingsModal.classList.remove('visible');
+        }
+    });
+
+    // Form submit
+    settingsForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        sysConfig.csvUrl = setCsvUrl.value.trim();
+        sysConfig.attendanceUrl = setAttendanceUrl.value.trim();
+        sysConfig.dbSheetUrl = setDbSheetUrl.value.trim();
+        
+        sysConfig.weeklyLinks[1] = setSchedMon.value.trim();
+        sysConfig.weeklyLinks[2] = setSchedTue.value.trim();
+        sysConfig.weeklyLinks[3] = setSchedWed.value.trim();
+        sysConfig.weeklyLinks[4] = setSchedThu.value.trim();
+        sysConfig.weeklyLinks[5] = setSchedFri.value.trim();
+        sysConfig.weeklyLinks[6] = setSchedSat.value.trim();
+        sysConfig.weeklyLinks[0] = setSchedMon.value.trim(); // Sunday defaults to Monday link
+
+        localStorage.setItem('system_config', JSON.stringify(sysConfig));
+        
+        updateQuickLinksHref();
+        loadDatabase();
+
+        settingsModal.classList.remove('visible');
+        showToast("Settings saved successfully!", "success");
+    });
+
+    // Reset button
+    resetSettingsBtn.addEventListener('click', () => {
+        if (confirm("Are you sure you want to reset all settings to default hardcoded links?")) {
+            localStorage.removeItem('system_config');
+            loadSystemConfig();
+            updateQuickLinksHref();
+            loadDatabase();
+            settingsModal.classList.remove('visible');
+            showToast("Settings reset to defaults", "warning");
+        }
+    });
+
+
+    // ─── Init ─────────────────────────────────────────────────────────────────────
+    renderList();
+    loadSystemConfig();
+    updateQuickLinksHref();
+    loadDatabase();
+</script>
+</body>
+</html>
